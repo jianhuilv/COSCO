@@ -1,4 +1,9 @@
 import sys
+
+import torch
+
+from .BaGTI.src.opt import opt
+
 sys.path.append('scheduler/BaGTI/')
 
 from .Scheduler import *

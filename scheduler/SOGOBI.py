@@ -1,4 +1,7 @@
 import sys
+
+from .BaGTI.src.opt import so_opt
+
 sys.path.append('scheduler/BaGTI/')
 
 from .Scheduler import *
