@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scheduler.GOBI import GOBIScheduler
 
-plt.style.use(['science'])
 plt.rcParams["text.usetex"] = False
 
 class Stats():
