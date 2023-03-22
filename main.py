@@ -10,6 +10,7 @@ import platform
 from time import time
 from subprocess import call
 from os import system, rename
+from .simpySim import Simulator as simpySimulator
 
 # Framework imports
 from framework.Framework import *
@@ -56,13 +57,16 @@ from stats.Stats import *
 from utils.Utils import *
 from pdb import set_trace as bp
 
-usage = "usage: python main.py -e <environment> -m <mode> # empty environment run simulator"
+usage = "usage: python main.py -e <environment> -m <mode> -s <simMode># empty environment run simulator"
 
 parser = optparse.OptionParser(usage=usage)
 parser.add_option("-e", "--environment", action="store", dest="env", default="",
                   help="Environment is AWS, Openstack, Azure, VLAN, Vagrant")
 parser.add_option("-m", "--mode", action="store", dest="mode", default="0",
                   help="Mode is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
+parser.add_option("-s", "--simMode", action="store", dest="simMode", default="0",
+                  help="simMode is 0 (simulate with cosco), 1 (simulate with simpy), 2(cosimulate with simpy")
+
 opts, args = parser.parse_args()
 
 # Global constants
@@ -70,9 +74,9 @@ NUM_SIM_STEPS = 100
 HOSTS = 10 * 5 if opts.env == '' else 10
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
-ROUTER_BW = 10000
 INTERVAL_TIME = 300  # seconds
 NEW_CONTAINERS = 0 if HOSTS == 10 else 5
+ROUTER_BW = 10000
 DB_NAME = ''
 DB_HOST = ''
 DB_PORT = 0
@@ -193,12 +197,10 @@ def saveStats(stats, datacenter, workload, env, end=True):
 
 
 if __name__ == '__main__':
-    env, mode = opts.env, int(opts.mode)
-
+    env, mode, simMode = opts.env, int(opts.mode), int(opts.simMode)
     if env != '':
         # Convert all agent files to unix format
         unixify(['framework/agent/', 'framework/agent/scripts/'])
-
         # Start InfluxDB service
         print(
             color.HEADER + 'InfluxDB service runs as a separate front-end window. Please minimize this window.' + color.ENDC)
@@ -229,17 +231,33 @@ if __name__ == '__main__':
 
     datacenter, workload, scheduler, env, stats = initalizeEnvironment(env, logger)
 
-    for step in range(NUM_SIM_STEPS):
-        print(color.BOLD + "Simulation Interval:", step, color.ENDC)
-        stepSimulation(workload, scheduler, env, stats)
-        if env != '' and step % 10 == 0: saveStats(stats, datacenter, workload, env, end=False)
+    # 如果使用Sim环境进行仿真
+    if simMode is 0:
+        for step in range(NUM_SIM_STEPS):
+            print(color.BOLD + "Simulation Interval:", step, color.ENDC)
+            stepSimulation(workload, scheduler, env, stats)
+            if env != '' and step % 10 == 0: saveStats(stats, datacenter, workload, env, end=False)
 
-    if opts.env != '':
-        # Destroy environment if required
-        eval('destroy' + opts.env + 'Environment(configFile, mode)')
+        if opts.env != '':
+            # Destroy environment if required
+            eval('destroy' + opts.env + 'Environment(configFile, mode)')
 
-        # Quit InfluxDB
+            # Quit InfluxDB
+            if 'Windows' in platform.system():
+                os.system('taskkill /f /im influxd.exe')
+
+        saveStats(stats, datacenter, workload, env)
+
+    elif simMode is 1:
+        # simpy纯仿真
+        simpyEnv = simpySimulator.Sim(env, datacenter, scheduler, workload, False)
+
+        simpyEnv.run(300)
+    else:
+        # 耦合仿真
+        simpyEnv = simpySimulator.Sim(env, datacenter, scheduler, workload, True)
+
         if 'Windows' in platform.system():
             os.system('taskkill /f /im influxd.exe')
 
-    saveStats(stats, datacenter, workload, env)
+        pass

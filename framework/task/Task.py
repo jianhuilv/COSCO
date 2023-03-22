@@ -94,6 +94,30 @@ class Task():
 		execTime = self.env.intervaltime - lastMigrationTime
 		self.totalExecTime += execTime
 
+	def simpyAllocateAndExecute(self, hostID):
+		# self.env.logger.debug("Allocating container "+self.json_body['fields']['name']+" to host "+self.env.getHostByID(hostID).ip)
+		self.hostid = hostID
+		self.json_body["fields"]["Host_id"] = hostID
+		_, lastMigrationTime = self.env.controller.create(self.json_body, self.env.getHostByID(self.hostid).ip)
+		self.totalMigrationTime += lastMigrationTime
+		execTime = self.env.intervaltime - lastMigrationTime
+		self.totalExecTime += execTime
+
+	def simpyAllocateAndRestore(self, hostID):
+		# self.env.logger.debug("Migrating container "+self.json_body['fields']['name']+" from host "+self.getHost().ip+
+		# 	" to host "+self.env.getHostByID(hostID).ip)
+		cur_host_ip = self.getHost().ip
+		self.hostid = hostID
+		tar_host_ip = self.getHost().ip
+		self.json_body["fields"]["Host_id"] = hostID
+		_, checkpointTime = self.env.controller.checkpoint(self.creationID, self.id, cur_host_ip)
+		_, migrationTime = self.env.controller.migrate(self.creationID, self.id, cur_host_ip, tar_host_ip)
+		_, restoreTime = self.env.controller.restore(self.creationID, self.id, self.application, tar_host_ip)
+		lastMigrationTime = checkpointTime + migrationTime + restoreTime
+		self.totalMigrationTime += lastMigrationTime
+		execTime = self.env.intervaltime - lastMigrationTime
+		self.totalExecTime += execTime
+
 	def allocateAndrestore(self, hostID):
 		# self.env.logger.debug("Migrating container "+self.json_body['fields']['name']+" from host "+self.getHost().ip+
 		# 	" to host "+self.env.getHostByID(hostID).ip)
