@@ -9,7 +9,6 @@ import statistics
 
 from sys import argv
 
-plt.style.use(['science', 'ieee'])
 plt.rcParams["text.usetex"] = True
 plt.rcParams['figure.figsize'] = 2, 1.2
 
