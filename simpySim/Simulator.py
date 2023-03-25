@@ -1,6 +1,6 @@
 import simpy
 from time import time, sleep
-
+from .util import ColorUtils
 from framework.workload import DeFogWorkload
 
 
@@ -75,6 +75,8 @@ class Sim:
                 self.scheduler.placement(selected + deployed))
             for decision in decisions:
                 self.decision_pipe.put(decision)
+
+            ColorUtils.printDecision(decisions)
 
             yield self.simpyEnv.timeout(schedulingTime)
 

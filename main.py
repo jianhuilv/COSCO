@@ -10,7 +10,7 @@ import platform
 from time import time
 from subprocess import call
 from os import system, rename
-from .simpySim import Simulator as simpySimulator
+from simpySim import Simulator as simpySimulator
 
 # Framework imports
 from framework.Framework import *
@@ -198,20 +198,20 @@ if __name__ == '__main__':
         DB_PORT = cfg['database']['port']
         DB_NAME = 'COSCO'
 
-		if env == 'Vagrant':
-			print("Setting up VirtualBox environment using Vagrant")
-			HOSTS_IP = setupVagrantEnvironment(configFile, mode)
-			print(HOSTS_IP)
-		elif env == 'VLAN':
-			print("Setting up VLAN environment using Ansible")
-			HOSTS_IP = setupVLANEnvironment(configFile, mode)
-			print(HOSTS_IP)
-		# exit()
+        if env == 'Vagrant':
+            print("Setting up VirtualBox environment using Vagrant")
+            HOSTS_IP = setupVagrantEnvironment(configFile, mode)
+            print(HOSTS_IP)
+        elif env == 'VLAN':
+            print("Setting up VLAN environment using Ansible")
+            HOSTS_IP = setupVLANEnvironment(configFile, mode)
+            print(HOSTS_IP)
+    # exit()
 
     datacenter, workload, scheduler, env, stats = initalizeEnvironment(env, logger)
 
     # 如果使用Sim环境进行仿真
-    if simMode is 0:
+    if simMode == 0:
         for step in range(NUM_SIM_STEPS):
             print(color.BOLD + "Simulation Interval:", step, color.ENDC)
             stepSimulation(workload, scheduler, env, stats)
@@ -227,7 +227,8 @@ if __name__ == '__main__':
 
         saveStats(stats, datacenter, workload, env)
 
-    elif simMode is 1:
+    elif simMode == 1:
+        print("simulate start with simpy")
         # simpy纯仿真
         simpyEnv = simpySimulator.Sim(env, datacenter, scheduler, workload, False)
 
@@ -238,5 +239,3 @@ if __name__ == '__main__':
 
         if 'Windows' in platform.system():
             os.system('taskkill /f /im influxd.exe')
-
-        pass
