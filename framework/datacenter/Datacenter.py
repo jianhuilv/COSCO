@@ -34,6 +34,7 @@ class Datacenter():
         payload = {"opcode": "hostDetails"+self.env_type}
         resp = requests.get("http://"+IP+":8081/request", data=json.dumps(payload))
         data = json.loads(resp.text)
+        print("data is :"+str(data))
         return data
 
     def generateHosts(self):

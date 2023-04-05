@@ -230,12 +230,12 @@ if __name__ == '__main__':
     elif simMode == 1:
         print("simulate start with simpy")
         # simpy纯仿真
-        simpyEnv = simpySimulator.Sim(env, datacenter, scheduler, workload, False)
+        simpyEnv = simpySimulator.Sim(env, datacenter, scheduler, workload, False, 300)
 
-        simpyEnv.run(300)
+        simpyEnv.run()
     else:
-        # 耦合仿真
-        simpyEnv = simpySimulator.Sim(env, datacenter, scheduler, workload, True)
+        # simpy耦合仿真
+        simpyEnv = simpySimulator.Sim(env, datacenter, scheduler, workload, True, 300)
 
         if 'Windows' in platform.system():
             os.system('taskkill /f /im influxd.exe')

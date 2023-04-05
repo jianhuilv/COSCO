@@ -76,9 +76,10 @@ class Container():
 		requiredExecTime = (self.ipsmodel.totalInstructions - self.ipsmodel.completedInstructions) / apparentIPS if apparentIPS else 0
 		self.totalExecTime += min(execTime, requiredExecTime)
 		self.ipsmodel.completedInstructions += apparentIPS * min(execTime, requiredExecTime)
+		return lastMigrationTime+min(execTime, requiredExecTime)
 
 	def allocateAndExecute(self, hostID, allocBw):
-		self.execute(self.allocate(hostID, allocBw))
+		return self.execute(self.allocate(hostID, allocBw))
 
 	def destroy(self):
 		self.destroyAt = self.env.interval
