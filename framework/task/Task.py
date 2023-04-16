@@ -144,21 +144,21 @@ class Task():
 		self.hostid = -1
 
 	def updateUtilizationMetrics(self, data):
-		self.ips = data['cpu'] * self.getHost().ipsCap / 100
-		self.ram.size = data['memory'] * self.getHost().ramCap.size / 100
+		self.ips = data['cpuPercent'] * self.getHost().ipsCap / 100
+		self.ram.size = data['memoryPercent'] * self.getHost().ramCap.size / 100
 		if self.lastReadBytes != 0:
-			self.ram.read = (data['read_bytes'] - self.lastReadBytes) / (1024 * 1024 * self.env.intervaltime)
-			self.ram.write = (data['write_bytes'] - self.lastWriteBytes) / (1024 * 1024 * self.env.intervaltime)
-			self.disk.read = (data['read_bytes'] - self.lastReadBytes) / (1024 * 1024 * self.env.intervaltime)
-			self.disk.write = (data['write_bytes'] - self.lastWriteBytes) / (1024 * 1024 * self.env.intervaltime)
-		self.lastReadBytes = data['read_bytes']	
-		self.lastWriteBytes = data['write_bytes']
-		self.disk.size = float(data['disk'][:-1]) if data['disk'][-1] == 'M' else 1024 * float(data['disk'][:-1])
-		self.bw.downlink = data['bw_down']
-		self.bw.uplink = data['bw_up']
+			self.ram.read = (data['readBytes'] - self.lastReadBytes) / (1024 * 1024 * self.env.intervaltime)
+			self.ram.write = (data['writeBytes'] - self.lastWriteBytes) / (1024 * 1024 * self.env.intervaltime)
+			self.disk.read = (data['readBytes'] - self.lastReadBytes) / (1024 * 1024 * self.env.intervaltime)
+			self.disk.write = (data['writeBytes'] - self.lastWriteBytes) / (1024 * 1024 * self.env.intervaltime)
+		self.lastReadBytes = data['readBytes']
+		self.lastWriteBytes = data['writeBytes']
+		self.disk.size = float(data['diskSize'][:-1]) if data['diskSize'][-2] == 'M' else 1024 * float(data['diskSize'][:-2])
+		self.bw.downlink = data['bwDown']
+		self.bw.uplink = data['bwUp']
 		self.active = data['running']
 		if not self.active:
-			finished_at = parser.parse(data['finished_at']).replace(tzinfo=None)
+			finished_at = parser.parse(data['finishedAt']).replace(tzinfo=None)
 			now = datetime.utcnow()
 			self.totalExecTime -= abs((now - finished_at).total_seconds())
 			self.execError = data['error']

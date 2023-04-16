@@ -5,7 +5,7 @@ class Database():
         self.db_name = db_name
         self.host = influxdb_host
         self.port = influxdb_port
-        self.conn = InfluxDBClient(host=self.host, port=self.port)
+        self.conn = InfluxDBClient(host=self.host, port=self.port,username="admin",password="admin")
         self.conn.drop_database(self.db_name)
         self.db = self.create(self.conn,self.db_name)
 

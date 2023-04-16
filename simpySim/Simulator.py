@@ -64,8 +64,7 @@ class Sim:
             yield self.schedule_flag.get()
             yield self.simpyEnv.timeout(0)
             # todo
-            #  这里应该加一个更新状态的，但是要保证这个时候所有的分配任务都已经完成。
-            #  用pipe或者其他变量，去接收？
+            #  随后正常执行saveStatus
 
     def generateNewContainersProcessForCo_simulate(self):
         """

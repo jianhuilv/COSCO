@@ -43,7 +43,7 @@ class RequestHandler():
         datapoint =  {
                     "measurement": "hostStat",
                     "tags": {
-                                "host_ip": data["ip"]
+                                "host_ip": data["hostIP"]
                             },
                     "fields":
                             {

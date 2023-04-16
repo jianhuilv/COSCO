@@ -53,12 +53,14 @@ def setupVLANEnvironment(cfg, mode):
         run_cmd_pwd("cp framework/config/hosts /etc/ansible/hosts", password)
         run_cmd_pwd("cp framework/config/ansible.cfg /etc/ansible/ansible.cfg", password)
         run_cmd("ansible-playbook framework/config/VLAN_ansible.yml")
-    uname = "ansible"
+    uname = "root"
     for ip in HOST_IPS:
         res = os.system(
-            "ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa " + uname + "@" + ip + " /home/ansible/agent/scripts/delete.sh > /dev/null 2>&1")
+            "ssh " + uname + "@" + ip + " sh digitalTwin/scripts/delete.sh")# > ./dev/eventLog.log 2>&1")
+
         res = os.system(
-            "ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa " + uname + "@" + ip + " sudo service docker restart > /dev/null 2>&1")
+            "ssh " + uname + "@" + ip + " sudo service docker restart ") #> ./dev/eventLog.log 2>&1")
+
     return HOST_IPS
 
 

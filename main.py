@@ -47,14 +47,13 @@ parser.add_option("-s", "--simMode", action="store", dest="simMode", default="0"
                   help="simMode is 0 (simulate with cosco), 1 (simulate with simpy), 2(cosimulate with simpy")
 
 opts, args = parser.parse_args()
-
 # Global constants
-NUM_SIM_STEPS = 100
+NUM_SIM_STEPS = 5
 HOSTS = 10 * 5 if opts.env == '' else 10
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
-INTERVAL_TIME = 300  # seconds
+INTERVAL_TIME = 30  # seconds
 NEW_CONTAINERS = 0 if HOSTS == 10 else 5
 DB_NAME = ''
 DB_HOST = ''
@@ -184,7 +183,7 @@ if __name__ == '__main__':
         print(
             color.HEADER + 'InfluxDB service runs as a separate front-end window. Please minimize this window.' + color.ENDC)
         if 'Windows' in platform.system():
-            os.startfile('C:/Program Files/InfluxDB/influxdb-1.8.3-1/influxd.exe')
+            os.startfile('C:/Program Files/InfluxDB/influxdb-1.8.3-1/influxdb-1.8.10-1/influxd.exe')
 
         configFile = 'framework/config/' + opts.env + '_config.json'
 
@@ -215,7 +214,8 @@ if __name__ == '__main__':
         for step in range(NUM_SIM_STEPS):
             print(color.BOLD + "Simulation Interval:", step, color.ENDC)
             stepSimulation(workload, scheduler, env, stats)
-            if env != '' and step % 10 == 0: saveStats(stats, datacenter, workload, env, end=False)
+            if env != '' and step % 10 == 0:
+                saveStats(stats, datacenter, workload, env, end=False)
 
         if opts.env != '':
             # Destroy environment if required
